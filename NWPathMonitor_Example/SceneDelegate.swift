@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
-        // 애플 프라이버시를 보호하기 위해 위치 권한 필요, WiFi 네트워크가 사용자의 위치를 어느정도 유추 할 수 있기 때문에, 명시적으로 권한을 부여한 경우에만 SSID 정보에 접근 할 수 있도록 제한
+        // 애플: 프라이버시 보호를 위해 위치 권한 필요, WiFi 네트워크가 사용자의 위치를 어느정도 유추 할 수 있기 때문에, 명시적으로 권한을 부여한 경우에만 SSID 정보에 접근 할 수 있도록 제한
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.requestWhenInUseAuthorization()
@@ -52,20 +52,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     
     private func loadNetworkErrorWindow(on scene: UIScene) {
         if let windowScene = scene as? UIWindowScene {
+            // 새로운 윈도우 창 만들기
             let window = UIWindow(windowScene: windowScene)
-            window.windowLevel = .statusBar
+            window.windowLevel = .statusBar // 창이 다른 차들 위에 표시되는 순서
             window.makeKeyAndVisible()
             
             let noNetworkView = NoNetworkView(frame: window.bounds)
+            // 해당 윈도우 위에 noNetworkView 올리기
             window.addSubview(noNetworkView)
             self.errorWindow = window
         }
     }
     
     private func removeNetworkErrorWindow() {
-        errorWindow?.resignKey()
-        errorWindow?.isHidden = true
-        errorWindow = nil
+        errorWindow?.resignKey() // keyWindow로부터 해지
+        errorWindow?.isHidden = true // 화면에서 제거 
+        errorWindow = nil // 리소스 제거
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
