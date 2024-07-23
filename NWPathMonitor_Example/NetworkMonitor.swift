@@ -18,7 +18,7 @@ final class NetworkMonitor {
         /*
          WiFi만 모니터링 할것이기 때문에 특정한 타입으로 설정 <=> 매개변수로 들어간 Interface는 제외 NWPathMonitor(prohibitedInterfaceTypes: <#T##[NWInterface.InterfaceType]#>)
          */
-        monitor = NWPathMonitor(requiredInterfaceType: .wifi)
+        monitor = NWPathMonitor()
         
         dump(monitor)
         print("--------------")

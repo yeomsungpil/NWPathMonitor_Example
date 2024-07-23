@@ -13,14 +13,14 @@ import SystemConfiguration.CaptiveNetwork
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
-    var errorWindow: UIWindow?
+    var errorWindow: UIWindow? // 연결이 끊겼을때 나타날 Window 창
     var networkMonitor: NetworkMonitor = NetworkMonitor()
     var locationManager: CLLocationManager?
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
-        // 애플: 프라이버시 보호를 위해 위치 권한 필요, WiFi 네트워크가 사용자의 위치를 어느정도 유추 할 수 있기 때문에, 명시적으로 권한을 부여한 경우에만 SSID 정보에 접근 할 수 있도록 제한
+        // iOS 13.0 이상 부터 애플: 프라이버시 보호를 위해 위치 권한 필요, WiFi 네트워크가 사용자의 위치를 어느정도 유추 할 수 있기 때문에, 명시적으로 권한을 부여한 경우에만 SSID 정보에 접근 할 수 있도록 제한
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.requestWhenInUseAuthorization()
@@ -78,6 +78,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         networkMonitor.stopMonitoring()
     }
     
+    // CLlocation 권한 설정에 따른 SSID fetch 유무
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .notDetermined:
@@ -96,6 +97,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     private func fetchCurrentWiFiSSID() {
         if let ssid = getWiFiSSID() {
             print("Connected Wi-Fi SSID: \(ssid)")
+            if ssid == "LIME_5G" {
+                print("Request 출석 체크")
+            }
         } else {
             print("Not connected to any Wi-Fi.")
         }
@@ -103,8 +107,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
 
     private func getWiFiSSID() -> String? {
         var ssid: String?
+        // Wi-Fi 인터페이스 목록 가져오기
+        // CNCopySupportedInterfaces : 현재 사용 가능한 WiFi 네트워크 인터페이스의 목록 반환
         if let interfaces = CNCopySupportedInterfaces() as NSArray? {
             for interface in interfaces {
+                // CNCopyCurrentNetworkInfo(CFString) : 인터페이스에 대한 네트워크 정보 반환 SSID, BSSID 정보 포함됌
+                // interfaceInfo : 딕셔너리 형태로 구성 [ SSID ( or BBID ) , 네트워크 name ]
                 if let interfaceInfo = CNCopyCurrentNetworkInfo(interface as! CFString) as NSDictionary? {
                     ssid = interfaceInfo[kCNNetworkInfoKeySSID as String] as? String
                     break
