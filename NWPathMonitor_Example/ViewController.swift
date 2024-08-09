@@ -12,24 +12,26 @@ class ViewController: UIViewController {
     
     var enterTimeOfficeArray: [String] = []
     
+    var selectedDate = Date()
+    
     lazy var calendar: FSCalendar = {
         let calendar = FSCalendar(frame: .zero)
         calendar.scope = .week
         calendar.locale = Locale(identifier: "ko_KR")
         calendar.appearance.headerDateFormat = "YYYY.M"
         calendar.appearance.headerMinimumDissolvedAlpha = 0.0
-        calendar.firstWeekday = 2
-        calendar.backgroundColor = .yellow
+//        calendar.firstWeekday = 2
+//        calendar.backgroundColor = .yellow
+//        calendar.appearance.weekdayTextColor = .label
         
         // 캘린더의 행 높이를 조정합니다.
         calendar.rowHeight = 30
         
         // 헤더의 높이를 조정합니다.
         calendar.headerHeight = 20
-        
         // 요일 레이블의 높이를 조정합니다.
         calendar.weekdayHeight = 20
-        
+        calendar.delegate = self
         return calendar
     }()
     
@@ -53,11 +55,20 @@ class ViewController: UIViewController {
         
         // 데이터가 변경되었음을 알리는 Notification 발송
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .didUpdateEnterTimes, object: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "reset", style: .plain, target: self, action: #selector(resetUserDefault))
+    }
+    
+    @objc
+    func resetUserDefault() {
+        self.enterTimeOfficeArray = []
+        UserDefaultsManager.resetData()
     }
     
     @objc
     func reloadTableView() {
-        self.enterTimeOfficeArray = UserDefaultsManager.enterTime
+        print("enterTimeOfficeArray : \(enterTimeOfficeArray.count)")
+       
+        self.enterTimeOfficeArray = UserDefaultsManager.enterTime.filter { $0.contains(selectedDate.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year()))}
         self.tableView.reloadData()
         
     }
@@ -82,10 +93,34 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController: FSCalendarDelegateAppearance {
+    // 토요일 파랑, 일요일 빨강으로 만들기
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
+        let day = Calendar.current.component(.weekday, from: date) - 1
+//        let isActive = activeDates.contains(date)
+//        let alpha: CGFloat = isActive ? 1.0 : 0.2
+        switch Calendar.current.shortWeekdaySymbols[day] {
+        case "Sun":
+            return UIColor.systemRed.withAlphaComponent(1.0)
+        case "Sat":
+            return UIColor.systemBlue.withAlphaComponent(1.0)
+        default:
+            return UIColor.label.withAlphaComponent(1.0)
+        }
+    }
+    
+    func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        self.enterTimeOfficeArray = UserDefaultsManager.enterTime.filter { $0.contains(date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year()))}
+        self.tableView.reloadData()
+    }
+    
+}
+
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
  
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        print("갯수 : \(enterTimeOfficeArray.count)")
         return enterTimeOfficeArray.count
     }
     

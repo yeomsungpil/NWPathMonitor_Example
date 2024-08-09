@@ -19,9 +19,11 @@ struct UserDefaultsManager {
         var times = enterTime
         times.insert(time, at: 0)
         enterTime = times
-        
-       
-        
+    }
+    
+    static func resetData() {
+        UserDefaults.standard.removeObject(forKey: "enterTime")
+        NotificationCenter.default.post(name: .didUpdateEnterTimes, object: nil)
     }
 }
 
