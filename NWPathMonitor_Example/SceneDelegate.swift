@@ -97,8 +97,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     private func fetchCurrentWiFiSSID() {
         if let ssid = getWiFiSSID() {
             print("Connected Wi-Fi SSID: \(ssid)")
-            if ssid == "LIME_5G" {
+            if ssid.contains("LIME") {
+                print(Date().formatted())
                 print("Request 출석 체크")
+                UserDefaultsManager.addEntetTime(Date().formatted(.dateTime.locale(Locale(identifier: "ko-KR")).day().month(.twoDigits).year().hour().minute(.twoDigits).second(.twoDigits)))
+                NotificationCenter.default.post(name: .didUpdateEnterTimes, object: nil)
             }
         } else {
             print("Not connected to any Wi-Fi.")

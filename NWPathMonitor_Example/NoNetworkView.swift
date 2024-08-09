@@ -19,10 +19,23 @@ class NoNetworkView: UIView {
         return view
     }()
     
+    var notEnterTheOfficeTextLabel: UILabel = {
+       let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 30, weight: .semibold)
+        label.text = "아직 출근 전이에요!"
+        return label
+    }()
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubview(baseView)
+//        self.addSubview(baseView)
+        self.addSubview(notEnterTheOfficeTextLabel)
+        
+        notEnterTheOfficeTextLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
     }
     
     required init?(coder: NSCoder) {

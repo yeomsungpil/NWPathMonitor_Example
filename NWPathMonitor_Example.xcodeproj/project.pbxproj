@@ -17,6 +17,10 @@
 		4DBA84662C4E491D00E2429C /* NoNetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBA84652C4E491D00E2429C /* NoNetworkView.swift */; };
 		4DBA84692C4E494200E2429C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4DBA84682C4E494200E2429C /* SnapKit */; };
 		4DBA846B2C4E49ED00E2429C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBA846A2C4E49ED00E2429C /* ViewController.swift */; };
+		4DC687C22C65A110008986DF /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 4DC687C12C65A110008986DF /* FSCalendar */; };
+		4DC687C52C65B1B2008986DF /* EnterOfficeTimeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC687C42C65B1B2008986DF /* EnterOfficeTimeCell.swift */; };
+		4DC687C82C65BD3C008986DF /* EnterOffice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC687C72C65BD3C008986DF /* EnterOffice.swift */; };
+		4DC687CB2C65BD97008986DF /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC687CA2C65BD97008986DF /* UserDefaultsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,9 @@
 		4DBA84642C4E457200E2429C /* NWPathMonitor_Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NWPathMonitor_Example.entitlements; sourceTree = "<group>"; };
 		4DBA84652C4E491D00E2429C /* NoNetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoNetworkView.swift; sourceTree = "<group>"; };
 		4DBA846A2C4E49ED00E2429C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4DC687C42C65B1B2008986DF /* EnterOfficeTimeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterOfficeTimeCell.swift; sourceTree = "<group>"; };
+		4DC687C72C65BD3C008986DF /* EnterOffice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterOffice.swift; sourceTree = "<group>"; };
+		4DC687CA2C65BD97008986DF /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DBA84692C4E494200E2429C /* SnapKit in Frameworks */,
+				4DC687C22C65A110008986DF /* FSCalendar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +78,9 @@
 				4DBA84502C4E048E00E2429C /* SceneDelegate.swift */,
 				4DBA84522C4E048E00E2429C /* BaseViewController.swift */,
 				4DBA846A2C4E49ED00E2429C /* ViewController.swift */,
+				4DC687C92C65BD88008986DF /* Userdefaults */,
+				4DC687C62C65BD2D008986DF /* Model */,
+				4DC687C32C65B1A5008986DF /* Cell */,
 				4DBA84652C4E491D00E2429C /* NoNetworkView.swift */,
 				4DBA84622C4E04D000E2429C /* NetworkMonitor.swift */,
 				4DBA84542C4E048E00E2429C /* Main.storyboard */,
@@ -78,6 +89,30 @@
 				4DBA845C2C4E048F00E2429C /* Info.plist */,
 			);
 			path = NWPathMonitor_Example;
+			sourceTree = "<group>";
+		};
+		4DC687C32C65B1A5008986DF /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				4DC687C42C65B1B2008986DF /* EnterOfficeTimeCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		4DC687C62C65BD2D008986DF /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4DC687C72C65BD3C008986DF /* EnterOffice.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4DC687C92C65BD88008986DF /* Userdefaults */ = {
+			isa = PBXGroup;
+			children = (
+				4DC687CA2C65BD97008986DF /* UserDefaultsManager.swift */,
+			);
+			path = Userdefaults;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -98,6 +133,7 @@
 			name = NWPathMonitor_Example;
 			packageProductDependencies = (
 				4DBA84682C4E494200E2429C /* SnapKit */,
+				4DC687C12C65A110008986DF /* FSCalendar */,
 			);
 			productName = NWPathMonitor_Example;
 			productReference = 4DBA844B2C4E048E00E2429C /* NWPathMonitor_Example.app */;
@@ -129,6 +165,7 @@
 			mainGroup = 4DBA84422C4E048E00E2429C;
 			packageReferences = (
 				4DBA84672C4E494100E2429C /* XCRemoteSwiftPackageReference "SnapKit" */,
+				4DC687C02C65A110008986DF /* XCRemoteSwiftPackageReference "FSCalendar" */,
 			);
 			productRefGroup = 4DBA844C2C4E048E00E2429C /* Products */;
 			projectDirPath = "";
@@ -160,8 +197,11 @@
 				4DBA846B2C4E49ED00E2429C /* ViewController.swift in Sources */,
 				4DBA84532C4E048E00E2429C /* BaseViewController.swift in Sources */,
 				4DBA84632C4E04D000E2429C /* NetworkMonitor.swift in Sources */,
+				4DC687C52C65B1B2008986DF /* EnterOfficeTimeCell.swift in Sources */,
 				4DBA84662C4E491D00E2429C /* NoNetworkView.swift in Sources */,
+				4DC687CB2C65BD97008986DF /* UserDefaultsManager.swift in Sources */,
 				4DBA844F2C4E048E00E2429C /* AppDelegate.swift in Sources */,
+				4DC687C82C65BD3C008986DF /* EnterOffice.swift in Sources */,
 				4DBA84512C4E048E00E2429C /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -399,6 +439,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		4DC687C02C65A110008986DF /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/WenchaoD/FSCalendar.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -406,6 +454,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4DBA84672C4E494100E2429C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		4DC687C12C65A110008986DF /* FSCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4DC687C02C65A110008986DF /* XCRemoteSwiftPackageReference "FSCalendar" */;
+			productName = FSCalendar;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
