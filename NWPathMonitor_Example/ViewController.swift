@@ -1,12 +1,7 @@
-//
-//  ViewController.swift
-//  NWPathMonitor_Example
-//
-//  Created by Limefriends on 7/22/24.
-//
 
 import UIKit
 import FSCalendar
+import SnapKit
 
 class ViewController: UIViewController {
     
@@ -14,23 +9,15 @@ class ViewController: UIViewController {
     
     var selectedDate = Date()
     
+    var calendarHeightConstraint: Constraint? // 높이 제약 조건을 저장할 변수
+    
     lazy var calendar: FSCalendar = {
-        let calendar = FSCalendar(frame: .zero)
+        let calendar = FSCalendar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 150))
         calendar.scope = .week
         calendar.locale = Locale(identifier: "ko_KR")
         calendar.appearance.headerDateFormat = "YYYY.M"
         calendar.appearance.headerMinimumDissolvedAlpha = 0.0
-//        calendar.firstWeekday = 2
-//        calendar.backgroundColor = .yellow
-//        calendar.appearance.weekdayTextColor = .label
-        
-        // 캘린더의 행 높이를 조정합니다.
-        calendar.rowHeight = 30
-        
-        // 헤더의 높이를 조정합니다.
-        calendar.headerHeight = 20
-        // 요일 레이블의 높이를 조정합니다.
-        calendar.weekdayHeight = 20
+        calendar.backgroundColor = .yellow
         calendar.delegate = self
         return calendar
     }()
@@ -74,7 +61,6 @@ class ViewController: UIViewController {
     }
     
     
-    
     fileprivate func setup() {
         view.backgroundColor = .white
         self.view.addSubview(calendar)
@@ -84,7 +70,8 @@ class ViewController: UIViewController {
     fileprivate func setupLayout() {
         calendar.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
-            make.height.equalTo(150)  // 높이를 150으로 설정
+            self.calendarHeightConstraint = make.height.equalTo(400).constraint // 초기 높이 제약 조건을 변수에 저장
+
         }
         tableView.snp.makeConstraints { make in
             make.top.equalTo(self.calendar.snp.bottom)
@@ -93,8 +80,8 @@ class ViewController: UIViewController {
     }
     
     fileprivate func isDateIncluded(date: Date) -> [String] {
-        let didSelectDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
-        let stringDate = String(describing: didSelectDate)
+        let convertDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
+        let stringDate = String(describing: convertDate)
         let prefixStringDate = String(stringDate.prefix(12))
         
         return UserDefaultsManager.enterTimeDatas.filter { $0.hasPrefix(prefixStringDate) }
@@ -119,13 +106,14 @@ extension ViewController: FSCalendarDelegateAppearance {
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        let didSelectDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
-        let stringDate = String(describing: didSelectDate)
-        let prefixStringDate = String(stringDate.prefix(12))
-        
         self.enterTimeOfficeArray = isDateIncluded(date: date)
         
         self.tableView.reloadData()
+    }
+    
+    func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
+        self.calendarHeightConstraint?.update(offset: bounds.height) // 높이 제약 조건 업데이트
+        self.view.layoutIfNeeded()
     }
     
 }
