@@ -12,18 +12,27 @@ struct UserDefaultsManager {
     
     
     @UserDefault(key: "enterTime", defaultValue: [])
-    static var enterTime: [String]
+    static var enterTimeDatas: [String]
     
     
-    static func addEntetTime(_ time: String) {
-        var times = enterTime
-        times.insert(time, at: 0)
-        enterTime = times
+    static func addEnterTime(_ time: String) {
+        
+        let currentDate = Date().formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
+        let stringDate = String(describing: currentDate)
+        let prefixStringDate = String(stringDate.prefix(12))
+        
+        // 배열안에 prefixStringDate로 시작하는 문자열이 하나라도 없을때
+        if !enterTimeDatas.contains(where: {
+            $0.hasPrefix(prefixStringDate)
+        }) {
+            enterTimeDatas.append(time)
+        }
     }
+    
     
     static func resetData() {
         UserDefaults.standard.removeObject(forKey: "enterTime")
-        NotificationCenter.default.post(name: .didUpdateEnterTimes, object: nil)
+        enterTimeDatas = []
     }
 }
 

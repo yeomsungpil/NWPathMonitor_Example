@@ -42,6 +42,7 @@ class ViewController: UIViewController {
         table.delegate = self
         table.dataSource = self
         table.separatorStyle = .none
+        table.isScrollEnabled = false
         table.register(EnterOfficeTimeCell.self, forCellReuseIdentifier: EnterOfficeTimeCell.identifier)
         return table
     }()
@@ -67,8 +68,7 @@ class ViewController: UIViewController {
     @objc
     func reloadTableView() {
         print("enterTimeOfficeArray : \(enterTimeOfficeArray.count)")
-       
-        self.enterTimeOfficeArray = UserDefaultsManager.enterTime.filter { $0.contains(selectedDate.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year()))}
+        self.enterTimeOfficeArray = isDateIncluded(date: Date())
         self.tableView.reloadData()
         
     }
@@ -91,6 +91,15 @@ class ViewController: UIViewController {
             make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
+    
+    fileprivate func isDateIncluded(date: Date) -> [String] {
+        let didSelectDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
+        let stringDate = String(describing: didSelectDate)
+        let prefixStringDate = String(stringDate.prefix(12))
+        
+        return UserDefaultsManager.enterTimeDatas.filter { $0.hasPrefix(prefixStringDate) }
+    }
+    
 }
 
 extension ViewController: FSCalendarDelegateAppearance {
@@ -110,7 +119,12 @@ extension ViewController: FSCalendarDelegateAppearance {
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.enterTimeOfficeArray = UserDefaultsManager.enterTime.filter { $0.contains(date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year()))}
+        let didSelectDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
+        let stringDate = String(describing: didSelectDate)
+        let prefixStringDate = String(stringDate.prefix(12))
+        
+        self.enterTimeOfficeArray = isDateIncluded(date: date)
+        
         self.tableView.reloadData()
     }
     

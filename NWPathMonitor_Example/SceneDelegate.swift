@@ -88,7 +88,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         case .denied:
             print("denied")
         case .authorizedAlways, .authorizedWhenInUse, .authorized:
-            fetchCurrentWiFiSSID()
+//            fetchCurrentWiFiSSID()
+            print("conntect Location")
         @unknown default:
             break
         }
@@ -100,7 +101,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
             if ssid.contains("LIME") {
                 print(Date().formatted())
                 print("Request 출석 체크")
-                UserDefaultsManager.addEntetTime(Date().formatted(.dateTime.locale(Locale(identifier: "ko-KR")).day().month(.twoDigits).year().hour().minute(.twoDigits).second(.twoDigits)))
+                UserDefaultsManager.addEnterTime(Date().formatted(.dateTime.locale(Locale(identifier: "ko-KR")).day().month(.twoDigits).year().hour().minute(.twoDigits).second(.twoDigits)))
                 NotificationCenter.default.post(name: .didUpdateEnterTimes, object: nil)
             }
         } else {

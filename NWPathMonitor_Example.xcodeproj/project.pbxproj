@@ -54,6 +54,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4DA78A172C69866100E75012 /* NetworkMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				4DBA84622C4E04D000E2429C /* NetworkMonitor.swift */,
+			);
+			path = NetworkMonitor;
+			sourceTree = "<group>";
+		};
 		4DBA84422C4E048E00E2429C = {
 			isa = PBXGroup;
 			children = (
@@ -82,7 +90,7 @@
 				4DC687C62C65BD2D008986DF /* Model */,
 				4DC687C32C65B1A5008986DF /* Cell */,
 				4DBA84652C4E491D00E2429C /* NoNetworkView.swift */,
-				4DBA84622C4E04D000E2429C /* NetworkMonitor.swift */,
+				4DA78A172C69866100E75012 /* NetworkMonitor */,
 				4DBA84542C4E048E00E2429C /* Main.storyboard */,
 				4DBA84572C4E048F00E2429C /* Assets.xcassets */,
 				4DBA84592C4E048F00E2429C /* LaunchScreen.storyboard */,
