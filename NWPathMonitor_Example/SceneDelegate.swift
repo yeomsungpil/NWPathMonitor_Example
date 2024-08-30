@@ -41,7 +41,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
             }
         }
         
-        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         let mainViewController = ViewController()
@@ -50,7 +49,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         window?.makeKeyAndVisible()
     }
     
+    @discardableResult
+    private func companyLocation() -> Bool {
+        // 회사 위치
+        let regionCenter = CLLocationCoordinate2D(latitude: 37.467640, longitude: 126.888187)
+        
+        // 회사 반경
+        let regionRadius : CLLocationDistance = 100
+        
+        let region = CLCircularRegion(center: regionCenter, radius: regionRadius, identifier: "Company")
+        region.notifyOnExit = true // 영역에서 날때 알림
+        
+        // 지정된 영역 모니터링 시작
+        locationManager?.startMonitoring(for: region)
+        
+        return region.notifyOnExit
+    }
+    
     private func loadNetworkErrorWindow(on scene: UIScene) {
+        
         if let windowScene = scene as? UIWindowScene {
             // 새로운 윈도우 창 만들기
             let window = UIWindow(windowScene: windowScene)
@@ -71,10 +88,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
         networkMonitor.stopMonitoring()
     }
     
@@ -95,17 +108,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         }
     }
     
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        if region.identifier == "Company" {
+            print("퇴근했습니다.")
+            NotificationCenter.default.post(name: .didUpdateLeaveTimes, object: nil)
+            networkMonitor.stopMonitoring()
+            locationManager?.stopUpdatingLocation()
+        }
+    }
+    
     private func fetchCurrentWiFiSSID() {
         if let ssid = getWiFiSSID() {
             print("Connected Wi-Fi SSID: \(ssid)")
             if ssid.contains("LIME") {
                 print(Date().formatted())
-                print("Request 출석 체크")
-                UserDefaultsManager.addEnterTime(Date().formatted(.dateTime.locale(Locale(identifier: "ko-KR")).day().month(.twoDigits).year().hour().minute(.twoDigits).second(.twoDigits)))
+                print("출석 체크")
+                UserDefaultsManager.addEnterTime(Date())
                 NotificationCenter.default.post(name: .didUpdateEnterTimes, object: nil)
             }
         } else {
-            print("Not connected to any Wi-Fi.")
+            
+            print("Not connected to any Wi-Fi. 끊긴 시간 : ")
+            let leaveTime = Date()
+            // 데이터를 저장하고 있다가 범위를 벗어나면 그때 저장
+            if companyLocation() {
+                UserDefaultsManager.addLeaveTime(leaveTime)
+            }
         }
     }
 
@@ -143,11 +171,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
+        // 백그라운드 상태일때도 Network 실행
+        fetchCurrentWiFiSSID()
     }
 
 
 }
+
 

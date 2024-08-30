@@ -5,11 +5,12 @@ import SnapKit
 
 class ViewController: UIViewController {
     
-    var enterTimeOfficeArray: [String] = []
+    var enterEnterOfficeTime: String?
+    var leaveOfficeTime: String?
     
     var selectedDate = Date()
     
-    var calendarHeightConstraint: Constraint? // 높이 제약 조건을 저장할 변수
+    var calendarHeightConstraint: Constraint? // 캘린더 높이 제약 조건을 저장할 변수
     
     lazy var calendar: FSCalendar = {
         let calendar = FSCalendar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 150))
@@ -40,25 +41,33 @@ class ViewController: UIViewController {
         navigationItem.title = "나의 라임 ( Rhyme )"
         setup()
         setupLayout()
-        
+        self.leaveOfficeTime = isDateIncluded(for: Date(), in: .leave).first
         // 데이터가 변경되었음을 알리는 Notification 발송
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .didUpdateEnterTimes, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadEnterTableView), name: .didUpdateEnterTimes, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadLeaveTableView), name: .didUpdateLeaveTimes, object: nil)
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "reset", style: .plain, target: self, action: #selector(resetUserDefault))
     }
     
     @objc
     func resetUserDefault() {
-        self.enterTimeOfficeArray = []
         UserDefaultsManager.resetData()
     }
     
     @objc
-    func reloadTableView() {
-        print("enterTimeOfficeArray : \(enterTimeOfficeArray.count)")
-        self.enterTimeOfficeArray = isDateIncluded(date: Date())
-        self.tableView.reloadData()
+    func reloadEnterTableView() {
+        self.enterEnterOfficeTime = isDateIncluded(for: Date(), in: .enter).first
+        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+    }
+    
+    @objc
+    func reloadLeaveTableView() {
+        self.leaveOfficeTime = isDateIncluded(for: Date(), in: .leave).first
+        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 1)], with: .automatic)
         
     }
+    
+    
     
     
     fileprivate func setup() {
@@ -79,14 +88,22 @@ class ViewController: UIViewController {
         }
     }
     
-    fileprivate func isDateIncluded(date: Date) -> [String] {
-        let convertDate = date.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
-        let stringDate = String(describing: convertDate)
-        let prefixStringDate = String(stringDate.prefix(12))
+    fileprivate func isDateIncluded(for date: Date?, in dataType: DataType) -> [String] {
+        guard let date = date else { return [""] }
         
-        return UserDefaultsManager.enterTimeDatas.filter { $0.hasPrefix(prefixStringDate) }
+        let dataArray: [Date]
+        
+        switch dataType {
+        case .enter:
+            dataArray = UserDefaultsManager.enterTimeDatas
+        case .leave:
+            dataArray = UserDefaultsManager.leaveTimeDatas
+        }
+        
+        return dataArray
+            .filter { UserDefaultsManager.isSameDay($0, date) }
+            .map { $0.formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year().hour().minute()) }
     }
-    
 }
 
 extension ViewController: FSCalendarDelegateAppearance {
@@ -106,8 +123,8 @@ extension ViewController: FSCalendarDelegateAppearance {
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        self.enterTimeOfficeArray = isDateIncluded(date: date)
-        
+        self.enterEnterOfficeTime = isDateIncluded(for: date, in: .enter).first
+        self.leaveOfficeTime = isDateIncluded(for: date, in: .leave).first
         self.tableView.reloadData()
     }
     
@@ -120,21 +137,56 @@ extension ViewController: FSCalendarDelegateAppearance {
 
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
- 
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        if leaveOfficeTime != nil  {
+            return 2
+        } else {
+            return 1
+        }
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("갯수 : \(enterTimeOfficeArray.count)")
-        return enterTimeOfficeArray.count
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: EnterOfficeTimeCell.identifier, for: indexPath) as? EnterOfficeTimeCell else { return UITableViewCell() }
         
-        cell.timeLabel.text = enterTimeOfficeArray[indexPath.row]
+        if leaveOfficeTime == nil {
+            cell.timeLabel.text = self.enterEnterOfficeTime ?? ""
+        } else {
+            switch indexPath.section {
+            case 0:
+                cell.timeLabel.text = enterEnterOfficeTime ?? ""
+            case 1:
+                cell.timeLabel.text = leaveOfficeTime!
+            default:
+                return cell
+            }
+        }
+       
         cell.selectionStyle = .none
         return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "출근 시간"
+        
+        switch section {
+        case 0:
+            return "출근 시간"
+        case 1:
+            return "퇴근 시간"
+        default:
+            return "잘못된 값"
+        }
     }
 }
+
+// TODO: - 로직 구현
+
+/*
+ 1. 와이파이 연결이 끊기고 해당 범위를 나갔을때 와이파이 끊긴 시간 leaveTime에 저장
+ 2. tableView 로직 리팩토링 및 isDateInCluded 메서드 수정
+ */
+

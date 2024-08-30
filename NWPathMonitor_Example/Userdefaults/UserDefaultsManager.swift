@@ -12,32 +12,40 @@ struct UserDefaultsManager {
     
     
     @UserDefault(key: "enterTime", defaultValue: [])
-    static var enterTimeDatas: [String]
+    static var enterTimeDatas: [Date]
     
+    @UserDefault(key: "leaveTime", defaultValue: [])
+    static var leaveTimeDatas: [Date]
     
-    static func addEnterTime(_ time: String) {
-        
-        let currentDate = Date().formatted(.dateTime.locale(Locale(identifier: "ko_KR")).day().month(.twoDigits).year())
-        let stringDate = String(describing: currentDate)
-        let prefixStringDate = String(stringDate.prefix(12))
-        
-        // 배열안에 prefixStringDate로 시작하는 문자열이 하나라도 없을때
-        if !enterTimeDatas.contains(where: {
-            $0.hasPrefix(prefixStringDate)
-        }) {
+    static func addEnterTime(_ time: Date) {
+        if !enterTimeDatas.contains(where: { isSameDay($0, time) }) {
             enterTimeDatas.append(time)
         }
+    }
+
+    static func addLeaveTime(_ time: Date) {
+        if !leaveTimeDatas.contains(where: { isSameDay($0, time) }) {
+            leaveTimeDatas.append(time)
+        }
+    }
+
+    static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(date1, inSameDayAs: date2)
     }
     
     
     static func resetData() {
         UserDefaults.standard.removeObject(forKey: "enterTime")
+        UserDefaults.standard.removeObject(forKey: "leaveTime")
         enterTimeDatas = []
+        leaveTimeDatas = []
     }
 }
 
 extension Notification.Name {
     static let didUpdateEnterTimes = Notification.Name("didUpdateEnterTimes")
+    static let didUpdateLeaveTimes = Notification.Name("didUpdateLeaveTimes")
 }
 
 

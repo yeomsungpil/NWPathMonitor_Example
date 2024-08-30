@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D3CCB2B2C81B3EA00F00501 /* DataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3CCB2A2C81B3EA00F00501 /* DataType.swift */; };
 		4DBA844F2C4E048E00E2429C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBA844E2C4E048E00E2429C /* AppDelegate.swift */; };
 		4DBA84512C4E048E00E2429C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBA84502C4E048E00E2429C /* SceneDelegate.swift */; };
 		4DBA84532C4E048E00E2429C /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DBA84522C4E048E00E2429C /* BaseViewController.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4D3CCB2A2C81B3EA00F00501 /* DataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataType.swift; sourceTree = "<group>"; };
 		4DBA844B2C4E048E00E2429C /* NWPathMonitor_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NWPathMonitor_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBA844E2C4E048E00E2429C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4DBA84502C4E048E00E2429C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -54,6 +56,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D3CCB292C81B3DF00F00501 /* Enum */ = {
+			isa = PBXGroup;
+			children = (
+				4D3CCB2A2C81B3EA00F00501 /* DataType.swift */,
+			);
+			path = Enum;
+			sourceTree = "<group>";
+		};
 		4DA78A172C69866100E75012 /* NetworkMonitor */ = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +91,7 @@
 		4DBA844D2C4E048E00E2429C /* NWPathMonitor_Example */ = {
 			isa = PBXGroup;
 			children = (
+				4D3CCB292C81B3DF00F00501 /* Enum */,
 				4DBA84642C4E457200E2429C /* NWPathMonitor_Example.entitlements */,
 				4DBA844E2C4E048E00E2429C /* AppDelegate.swift */,
 				4DBA84502C4E048E00E2429C /* SceneDelegate.swift */,
@@ -211,6 +222,7 @@
 				4DBA844F2C4E048E00E2429C /* AppDelegate.swift in Sources */,
 				4DC687C82C65BD3C008986DF /* EnterOffice.swift in Sources */,
 				4DBA84512C4E048E00E2429C /* SceneDelegate.swift in Sources */,
+				4D3CCB2B2C81B3EA00F00501 /* DataType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +378,7 @@
 				DEVELOPMENT_TEAM = T59N98762C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NWPathMonitor_Example/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "돔황챠";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -396,6 +409,7 @@
 				DEVELOPMENT_TEAM = T59N98762C;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NWPathMonitor_Example/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "돔황챠";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
