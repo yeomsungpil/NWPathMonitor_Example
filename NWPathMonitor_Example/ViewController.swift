@@ -75,11 +75,11 @@ class ViewController: UIViewController {
     private func setSwipeCalendarHeight() {
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipeEvent(_:)))
         swipeUp.direction = .up
-        self.view.addGestureRecognizer(swipeUp)
+        self.calendar.addGestureRecognizer(swipeUp)
         
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(swipeEvent(_:)))
         swipeDown.direction = .down
-        self.view.addGestureRecognizer(swipeDown)
+        self.calendar.addGestureRecognizer(swipeDown)
     }
     
     @objc
