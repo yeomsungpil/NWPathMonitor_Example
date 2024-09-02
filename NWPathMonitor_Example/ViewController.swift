@@ -41,6 +41,7 @@ class ViewController: UIViewController {
         navigationItem.title = "나의 라임 ( Rhyme )"
         setup()
         setupLayout()
+        self.enterEnterOfficeTime = isDateIncluded(for: Date(), in: .enter).first
         self.leaveOfficeTime = isDateIncluded(for: Date(), in: .leave).first
         // 데이터가 변경되었음을 알리는 Notification 발송
         NotificationCenter.default.addObserver(self, selector: #selector(reloadEnterTableView), name: .didUpdateEnterTimes, object: nil)
@@ -52,6 +53,8 @@ class ViewController: UIViewController {
     @objc
     func resetUserDefault() {
         UserDefaultsManager.resetData()
+        enterEnterOfficeTime = nil
+        leaveOfficeTime = nil
     }
     
     @objc
@@ -154,13 +157,13 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: EnterOfficeTimeCell.identifier, for: indexPath) as? EnterOfficeTimeCell else { return UITableViewCell() }
         
         if leaveOfficeTime == nil {
-            cell.timeLabel.text = self.enterEnterOfficeTime ?? ""
+            cell.timeLabel.text = self.enterEnterOfficeTime ?? "출근 전 입니다."
         } else {
             switch indexPath.section {
             case 0:
-                cell.timeLabel.text = enterEnterOfficeTime ?? ""
+                cell.timeLabel.text = enterEnterOfficeTime ?? "출근 전 입니다."
             case 1:
-                cell.timeLabel.text = leaveOfficeTime!
+                cell.timeLabel.text = leaveOfficeTime ?? "퇴근 전 입니다."
             default:
                 return cell
             }
@@ -182,11 +185,3 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
-
-// TODO: - 로직 구현
-
-/*
- 1. 와이파이 연결이 끊기고 해당 범위를 나갔을때 와이파이 끊긴 시간 leaveTime에 저장
- 2. tableView 로직 리팩토링 및 isDateInCluded 메서드 수정
- */
-
