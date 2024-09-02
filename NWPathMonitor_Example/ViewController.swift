@@ -11,6 +11,11 @@ class ViewController: UIViewController {
     var selectedDate = Date()
     
     var calendarHeightConstraint: Constraint? // 캘린더 높이 제약 조건을 저장할 변수
+    let currentCalendar = Calendar.current
+    
+    var enterTimeDatesSet: Set<Date> = [] // 시간 복잡도를 줄이기 위해 Set 사용
+    
+    
     
     lazy var calendar: FSCalendar = {
         let calendar = FSCalendar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 150))
@@ -18,7 +23,7 @@ class ViewController: UIViewController {
         calendar.locale = Locale(identifier: "ko_KR")
         calendar.appearance.headerDateFormat = "YYYY.M"
         calendar.appearance.headerMinimumDissolvedAlpha = 0.0
-        calendar.backgroundColor = .yellow
+//        calendar.backgroundColor = .yellow
         calendar.delegate = self
         return calendar
     }()
@@ -35,6 +40,21 @@ class ViewController: UIViewController {
         return table
     }()
     
+    lazy var enterCheckTextLabel: UILabel = {
+       let label = UILabel()
+        label.text = "출근 임시 값"
+        label.font = UIFont.systemFont(ofSize: 10, weight: .semibold)
+        return label
+    }()
+    
+    lazy var leaveCheckTextLabel: UILabel = {
+       let label = UILabel()
+        label.text = "퇴근 임시 값"
+        label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
+        return label
+    }()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print(#function)
@@ -48,7 +68,26 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadLeaveTableView), name: .didUpdateLeaveTimes, object: nil)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "reset", style: .plain, target: self, action: #selector(resetUserDefault))
+        setSwipeCalendarHeight()
+
     }
+    
+    private func setSwipeCalendarHeight() {
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipeEvent(_:)))
+        swipeUp.direction = .up
+        self.view.addGestureRecognizer(swipeUp)
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(swipeEvent(_:)))
+        swipeDown.direction = .down
+        self.view.addGestureRecognizer(swipeDown)
+    }
+    
+    @objc
+    func swipeEvent(_ swipe: UISwipeGestureRecognizer) {
+        let newScope: FSCalendarScope = swipe.direction == .up ? .week : .month
+        calendar.setScope(newScope, animated: true)
+    }
+
     
     @objc
     func resetUserDefault() {
@@ -61,12 +100,20 @@ class ViewController: UIViewController {
     func reloadEnterTableView() {
         self.enterEnterOfficeTime = isDateIncluded(for: Date(), in: .enter).first
         self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+        
+        DispatchQueue.main.async {
+            self.enterCheckTextLabel.text = "범위에 들어왔습니다. 출근했습니다."
+        }
     }
     
     @objc
     func reloadLeaveTableView() {
         self.leaveOfficeTime = isDateIncluded(for: Date(), in: .leave).first
         self.tableView.reloadRows(at: [IndexPath(row: 0, section: 1)], with: .automatic)
+        
+        DispatchQueue.main.async {
+            self.leaveCheckTextLabel.text = "범위를 벗어났습니다. 퇴근했습니다."
+        }
         
     }
     
@@ -75,8 +122,13 @@ class ViewController: UIViewController {
     
     fileprivate func setup() {
         view.backgroundColor = .white
-        self.view.addSubview(calendar)
-        self.view.addSubview(tableView)
+        [calendar, tableView, enterCheckTextLabel, leaveCheckTextLabel].forEach {
+            self.view.addSubview($0)
+        }
+        calendar.delegate = self
+        calendar.dataSource = self
+        // 날짜에서 시간 정보를 제거한 후 Set에 저장
+        enterTimeDatesSet = Set(UserDefaultsManager.enterTimeDatas.map { currentCalendar.startOfDay(for: $0)})
     }
     
     fileprivate func setupLayout() {
@@ -85,10 +137,23 @@ class ViewController: UIViewController {
             self.calendarHeightConstraint = make.height.equalTo(400).constraint // 초기 높이 제약 조건을 변수에 저장
 
         }
+        
         tableView.snp.makeConstraints { make in
             make.top.equalTo(self.calendar.snp.bottom)
-            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
+            make.height.equalTo(250)
         }
+        
+        enterCheckTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(self.tableView.snp.bottom).offset(10)
+            make.leading.equalTo(self.tableView.snp.leading).offset(10)
+        }
+        
+        leaveCheckTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(self.enterCheckTextLabel.snp.bottom).offset(10)
+            make.leading.equalTo(enterCheckTextLabel)
+        }
+        
     }
     
     fileprivate func isDateIncluded(for date: Date?, in dataType: DataType) -> [String] {
@@ -136,6 +201,25 @@ extension ViewController: FSCalendarDelegateAppearance {
         self.view.layoutIfNeeded()
     }
     
+}
+
+extension ViewController: FSCalendarDelegate, FSCalendarDataSource {
+    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+        
+        let dateWithoutTime = currentCalendar.startOfDay(for: date)
+        return enterTimeDatesSet.contains(dateWithoutTime) ? 1: 0
+    }
+    
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, eventDefaultColorsFor date: Date) -> [UIColor]? {
+        
+        let dateWithoutTime = currentCalendar.startOfDay(for: date)
+        return enterTimeDatesSet.contains(dateWithoutTime) ? [UIColor.green] : nil
+    }
+    
+    func calendar(_ calendar: FSCalendar, willDisplay cell: FSCalendarCell, for date: Date, at monthPosition: FSCalendarMonthPosition) {
+        let eventScaleFactor: CGFloat = 1.8
+        cell.eventIndicator.transform = CGAffineTransform(scaleX: eventScaleFactor, y: eventScaleFactor)
+    }
 }
 
 

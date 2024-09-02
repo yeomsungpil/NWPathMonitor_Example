@@ -1,16 +1,10 @@
-//
-//  SceneDelegate.swift
-//  NWPathMonitor_Example
-//
-//  Created by Limefriends on 7/22/24.
-//
 
 import UIKit
 import NetworkExtension
 import CoreLocation
 import SystemConfiguration.CaptiveNetwork
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelegate {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     var errorWindow: UIWindow? // 연결이 끊겼을때 나타날 Window 창
@@ -45,23 +39,34 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         window = UIWindow(windowScene: windowScene)
         let mainViewController = ViewController()
         
-        window?.rootViewController = UINavigationController(rootViewController: mainViewController)
-        window?.makeKeyAndVisible()
-    }
-    
-
-    private func companyLocation() {
-        // 회사 위치
-        let regionCenter = CLLocationCoordinate2D(latitude: 37.467640, longitude: 126.888187)
+        let regionCenter = CLLocationCoordinate2D(latitude: 37.467640, longitude: 126.887659)
         
         // 회사 반경
-        let regionRadius : CLLocationDistance = 1
+        let regionRadius : CLLocationDistance = 0.5
         
         let region = CLCircularRegion(center: regionCenter, radius: regionRadius, identifier: "Company")
         region.notifyOnExit = true // 해당 영역에서 벗어났을때 이벤트 발생
         
         // 지정된 영역 모니터링 시작
         locationManager?.startMonitoring(for: region)
+        
+        window?.rootViewController = UINavigationController(rootViewController: mainViewController)
+        window?.makeKeyAndVisible()
+    }
+    
+
+    private func companyLocation() {
+        // 회사 위치 스타벅스 37.467640, 126.887659
+//        let regionCenter = CLLocationCoordinate2D(latitude: 37.467640, longitude: 126.887659)
+//        
+//        // 회사 반경
+//        let regionRadius : CLLocationDistance = 0.5
+//        
+//        let region = CLCircularRegion(center: regionCenter, radius: regionRadius, identifier: "Company")
+//        region.notifyOnExit = true // 해당 영역에서 벗어났을때 이벤트 발생
+//        
+//        // 지정된 영역 모니터링 시작
+//        locationManager?.startMonitoring(for: region)
     }
     
     private func loadNetworkErrorWindow(on scene: UIScene) {
@@ -105,17 +110,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
             break
         }
     }
-    
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        if region.identifier == "Company" {
-            print("퇴근했습니다.")
-            
-            let leaveTime = Date()
-            UserDefaultsManager.addLeaveTime(leaveTime)
-            NotificationCenter.default.post(name: .didUpdateLeaveTimes, object: nil)
-            locationManager?.stopUpdatingLocation()
-        }
-    }
+
     
     private func fetchCurrentWiFiSSID() {
         if let ssid = getWiFiSSID() {
@@ -129,7 +124,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
         } else {
             
             print("Not connected to any Wi-Fi. 끊긴 시간 : ")
-            companyLocation()
+//            companyLocation()
         }
     }
 
@@ -174,4 +169,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, CLLocationManagerDelega
 
 }
 
+extension SceneDelegate: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        if region.identifier == "Company" {
+            print("퇴근했습니다. - didExitRegion")
+            
+            let leaveTime = Date()
+            UserDefaultsManager.addLeaveTime(leaveTime)
+            NotificationCenter.default.post(name: .didUpdateLeaveTimes, object: nil)
+            locationManager?.stopUpdatingLocation()
+            networkMonitor.stopMonitoring()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("출근했습니다 - didEnterRegion")
+    }
+}
 
