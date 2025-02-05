@@ -40,7 +40,6 @@ git commit -m "Refactored project from $OLD_PROJECT_NAME to $NEW_PROJECT_NAME"
 git push origin main
 
 echo "✅ 프로젝트 변경 완료! 🎉"
-  ```
 
 
 
