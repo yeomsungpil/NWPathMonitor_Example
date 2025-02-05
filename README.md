@@ -1,6 +1,8 @@
-#!/bin/bash
 
+* 스크립트
+  
 # 기존 프로젝트 정보
+#!/bin/bash
 OLD_PROJECT_NAME="boilerplate"  # 기존 프로젝트명 (현재 이름)
 NEW_PROJECT_NAME="test3"        # 새로운 프로젝트명 (변경할 이름)
 
@@ -36,3 +38,10 @@ git commit -m "Refactored project from $OLD_PROJECT_NAME to $NEW_PROJECT_NAME"
 git push origin main
 
 echo "✅ 프로젝트 변경 완료! 🎉"
+
+
+* 터미널에서 실행 권한을 부여합니다
+chmod +x rename_script.sh
+
+* 스크립트 실행
+./rename_script.sh
